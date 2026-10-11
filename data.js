@@ -53,10 +53,9 @@ window.EXHIBITIONS=[
     "checkedAt": "2026-10-12",
     "sourceKey": "osaka",
     "admission": {
-      "status": "取得成功",
+      "status": "取得失敗",
       "checkedAt": "2026-10-12",
-      "sourceUrl": "https://nakka-art.jp/exhibition-post/nichibiten50/",
-      "yen": 2000
+      "sourceUrl": "https://nakka-art.jp/exhibition-post/nichibiten50/"
     }
   },
   {
@@ -131,10 +130,9 @@ window.EXHIBITIONS=[
     "checkedAt": "2026-10-12",
     "sourceKey": "osaka",
     "admission": {
-      "status": "取得成功",
+      "status": "取得失敗",
       "checkedAt": "2026-10-12",
-      "sourceUrl": "https://nakka-art.jp/exhibition-post/colle-naka-2026/",
-      "yen": 0
+      "sourceUrl": "https://nakka-art.jp/exhibition-post/colle-naka-2026/"
     }
   },
   {
@@ -151,10 +149,9 @@ window.EXHIBITIONS=[
     "checkedAt": "2026-10-12",
     "sourceKey": "osaka",
     "admission": {
-      "status": "取得成功",
+      "status": "取得失敗",
       "checkedAt": "2026-10-12",
-      "sourceUrl": "https://nakka-art.jp/exhibition-post/daiei-ten2026/",
-      "yen": 2300
+      "sourceUrl": "https://nakka-art.jp/exhibition-post/daiei-ten2026/"
     }
   },
   {
@@ -171,10 +168,9 @@ window.EXHIBITIONS=[
     "checkedAt": "2026-10-12",
     "sourceKey": "osaka",
     "admission": {
-      "status": "取得成功",
+      "status": "取得失敗",
       "checkedAt": "2026-10-12",
-      "sourceUrl": "https://nakka-art.jp/exhibition-post/osaka-directory-dir13/",
-      "yen": 0
+      "sourceUrl": "https://nakka-art.jp/exhibition-post/osaka-directory-dir13/"
     }
   },
   {
@@ -191,10 +187,9 @@ window.EXHIBITIONS=[
     "checkedAt": "2026-10-12",
     "sourceKey": "osaka",
     "admission": {
-      "status": "取得成功",
+      "status": "取得失敗",
       "checkedAt": "2026-10-12",
-      "sourceUrl": "https://nakka-art.jp/exhibition-post/osaka-directory-dir14/",
-      "yen": 0
+      "sourceUrl": "https://nakka-art.jp/exhibition-post/osaka-directory-dir14/"
     }
   },
   {
@@ -211,10 +206,9 @@ window.EXHIBITIONS=[
     "checkedAt": "2026-10-12",
     "sourceKey": "osaka",
     "admission": {
-      "status": "取得成功",
+      "status": "取得失敗",
       "checkedAt": "2026-10-12",
-      "sourceUrl": "https://nakka-art.jp/exhibition-post/paving-the-way100/",
-      "yen": 1900
+      "sourceUrl": "https://nakka-art.jp/exhibition-post/paving-the-way100/"
     }
   },
   {
@@ -231,10 +225,9 @@ window.EXHIBITIONS=[
     "checkedAt": "2026-10-12",
     "sourceKey": "osaka",
     "admission": {
-      "status": "取得成功",
+      "status": "取得失敗",
       "checkedAt": "2026-10-12",
-      "sourceUrl": "https://nakka-art.jp/exhibition-post/osaka-directory-dir15/",
-      "yen": 0
+      "sourceUrl": "https://nakka-art.jp/exhibition-post/osaka-directory-dir15/"
     }
   },
   {
@@ -686,6 +679,62 @@ window.EXHIBITIONS=[
       "checkedAt": "2026-10-12",
       "sourceUrl": "https://www.kobecitymuseum.jp/exhibition/detail?exhibition=397"
     }
+  },
+  {
+    "id": "oyamazaki-62eae62b4a3b12",
+    "title": "開館30周年記念 ジョルジュ・ルオー ―いつくしむまなざし、祈りの筆あと",
+    "short": "開館30周年記念 ジョルジュ・ルオー ―いつくしむまなざし、祈りの筆あと",
+    "museum": "アサヒグループ大山崎山荘美術館",
+    "region": "京都",
+    "start": "2026-09-19",
+    "end": "2026-12-06",
+    "url": "https://www.asahigroup-oyamazaki.com/exhibition/rouault/",
+    "bg": "#d9cbb5",
+    "fg": "#303b32",
+    "checkedAt": "2026-10-12",
+    "sourceKey": "oyamazaki"
+  },
+  {
+    "id": "oyamazaki-4ed143ae21ced9",
+    "title": "開館30周年記念 没後100年 クロード・モネ展",
+    "short": "開館30周年記念 没後100年 クロード・モネ展",
+    "museum": "アサヒグループ大山崎山荘美術館",
+    "region": "京都",
+    "start": "2026-03-20",
+    "end": "2027-04-11",
+    "url": "https://www.asahigroup-oyamazaki.com/exhibition/monet/",
+    "bg": "#d9cbb5",
+    "fg": "#303b32",
+    "checkedAt": "2026-10-12",
+    "sourceKey": "oyamazaki"
+  },
+  {
+    "id": "oyamazaki-bb93ad00fcd9db",
+    "title": "開館30周年記念 萩尾望都展 ―欧州への憧憬",
+    "short": "開館30周年記念 萩尾望都展 ―欧州への憧憬",
+    "museum": "アサヒグループ大山崎山荘美術館",
+    "region": "京都",
+    "start": "2026-12-19",
+    "end": "2027-04-11",
+    "url": "https://www.asahigroup-oyamazaki.com/exhibition/hagiomoto/",
+    "bg": "#d9cbb5",
+    "fg": "#303b32",
+    "checkedAt": "2026-10-12",
+    "sourceKey": "oyamazaki"
+  },
+  {
+    "id": "oyamazaki-7fc0a397774363",
+    "title": "町田市立国際版画美術館所蔵 長谷川潔展―パリに生きた銅版画家の軌跡",
+    "short": "町田市立国際版画美術館所蔵 長谷川潔展―パリに生きた銅版画家の軌跡",
+    "museum": "アサヒグループ大山崎山荘美術館",
+    "region": "京都",
+    "start": "2027-04-24",
+    "end": "2027-06-27",
+    "url": "https://www.asahigroup-oyamazaki.com/exhibition/e5ac61063c57c7dd7df4a6fee9987d81ba5c66a7/",
+    "bg": "#d9cbb5",
+    "fg": "#303b32",
+    "checkedAt": "2026-10-12",
+    "sourceKey": "oyamazaki"
   }
 ];
-window.COLLECTION_STATUS={"checkedAt": "2026-10-11T21:28:50.918977+00:00", "sources": [{"museum": "兵庫県立美術館", "status": "取得成功", "count": 11}, {"museum": "大阪中之島美術館", "status": "取得成功", "count": 7}, {"museum": "京都国立博物館", "status": "取得成功", "count": 28}, {"museum": "神戸市立博物館", "status": "取得成功", "count": 2}, {"museum": "京都市京セラ美術館・国立西洋美術館", "status": "手動確認分を掲載・自動更新対象外"}], "admission": {"取得成功": 11, "確認できず": 2, "取得失敗": 0}};
+window.COLLECTION_STATUS={"checkedAt": "2026-10-11T23:33:37.807000+00:00", "sources": [{"museum": "兵庫県立美術館", "status": "取得成功", "count": 11}, {"museum": "大阪中之島美術館", "status": "取得失敗・既存情報を維持", "error": "<urlopen error timed out>"}, {"museum": "京都国立博物館", "status": "取得成功", "count": 28}, {"museum": "アサヒグループ大山崎山荘美術館", "status": "取得成功", "count": 4}, {"museum": "神戸市立博物館", "status": "取得成功", "count": 2}, {"museum": "京都市京セラ美術館・国立西洋美術館", "status": "手動確認分を掲載・自動更新対象外"}], "admission": {"取得成功": 4, "確認できず": 2, "取得失敗": 7}};
