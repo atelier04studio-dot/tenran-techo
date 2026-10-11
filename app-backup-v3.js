@@ -24,7 +24,7 @@ function backupSummary(x){return {custom:(x.custom||[]).length,favorites:x.favor
 $('#backup').onclick=async()=>{try{if(!db)throw Error('保存領域を開けません。書き出しは中止しました。');const current=await new Promise((resolve,reject)=>{const r=db.transaction('notebook').objectStore('notebook').get('state');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)});const snapshot=current||saved;if(!valid(snapshot))throw Error('保存データを確認できません。書き出しは中止しました。');const counts=backupSummary(snapshot);if(!counts.custom&&!counts.favorites&&!counts.records&&!counts.photos){alert('このブラウザには保存済みの写真・お気に入り・鑑賞記録がありません。空のバックアップは作成しません。写真が表示されている端末・ブラウザで開き、写真の画面で「写真・記録を保存」を押したか確認してください。');return}const now=new Date();const backup={format:'tenran-techo',version:4,exportedAt:now.toISOString(),counts,...snapshot,photos:snapshot.photos||{}};const u=URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download='展覧手帖-'+today()+'-'+now.toISOString().slice(11,19).replaceAll(':','')+'-写真'+counts.photos+'枚.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);toast('書き出し内容：写真'+counts.photos+'枚・記録'+counts.records+'件・お気に入り'+counts.favorites+'件')}catch(e){toast(e.message||'書き出しに失敗しました。写真や記録は削除していません。')}};
 $('#restore').onchange=async e=>{try{const file=e.target.files[0];if(!file)return;if(file.size>60000000)throw Error();const x=JSON.parse(await file.text());if(!valid(x))throw Error();if(!confirm('このファイルの記録とお気に入りを、現在の手帖に追加します。同じ展覧会の記録・写真は読み込む内容で置き換わります。'))return;const next={favorites:[...new Set([...saved.favorites,...x.favorites])],records:{...saved.records,...x.records},photos:{...saved.photos,...(x.photos||{})},custom:[...new Map([...(saved.custom||[]),...(x.custom||[])].map(e=>[e.id,e])).values()]};if(await persist(next))toast('手帖を読み込みました')}catch{toast('手帖のファイルを読み込めませんでした。')}finally{e.target.value=''}};init();
 
-if(window.COLLECTION_STATUS){const c=window.COLLECTION_STATUS;const failed=c.sources.filter(s=>s.status.startsWith('取得失敗')).map(s=>s.museum);$('#freshness').textContent='最終取得処理：'+new Date(c.checkedAt).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'})+'（日本時間） / 毎朝6:17以降に自動更新。対象：兵庫県立・大阪中之島・京都国立博物館・神戸市立博物館。その他は手動確認分。'+(failed.length?' 取得できなかった施設（前回の情報を表示）：'+failed.join('、'):'');}
+if(window.COLLECTION_STATUS){const c=window.COLLECTION_STATUS;const failed=c.sources.filter(s=>s.status.startsWith('取得失敗')).map(s=>s.museum);$('#freshness').textContent='最終取得処理：'+new Date(c.checkedAt).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'})+'（日本時間） / 毎朝6:17以降に自動更新。対象：兵庫県立・大阪中之島・京都国立博物館・神戸市立博物館・大山崎山荘美術館。その他は手動確認分。'+(failed.length?' 取得できなかった施設（前回の情報を表示）：'+failed.join('、'):'');}
 
 let detailExhibition;
 function openDetails(id){
@@ -37,7 +37,7 @@ function openDetails(id){
  $('#detail-official').href=e.url||'#';$('#detail-official').hidden=!e.url;
  const input=$('#calendar-date');input.min=e.start;input.max=e.end;
  const preferred=$('#day').value||today();input.value=e.start?(preferred<e.start?e.start:preferred>e.end?e.end:preferred):preferred;
- updateCalendarLink();$('#details').showModal();$('.detail-scroll').scrollTop=0;
+ updateCalendarLink();$('#details').showModal();renderInstagram(e);$('.detail-scroll').scrollTop=0;
 }
 $('#grid').addEventListener('click',e=>{const p=e.target.closest('[data-detail]');if(p)openDetails(p.dataset.detail)});
 $('#grid').addEventListener('keydown',e=>{const p=e.target.closest('[data-detail]');if(p&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openDetails(p.dataset.detail)}});
@@ -62,3 +62,24 @@ let customEditing=null,customBusy=false;
 function openCustom(id=null){customEditing=id;const e=(saved.custom||[]).find(e=>e.id===id),r=saved.records[id];$('#custom-form').reset();$('#custom-heading').textContent=e?'自分で登録した情報を編集':'展覧会を自分で追加';for(const k of ['title','museum','region','start','end','url','fee'])$('#custom-'+k).value=e?.[k]||(k==='region'?'兵庫':'');$('#custom-favorite').checked=e?saved.favorites.includes(id):tab!=='records';$('#custom-visit').max=today();$('#custom-visit').value=r?.date||(!e&&tab==='records'?today():'');$('#custom-note').value=r?.note||'';$('#custom-error').textContent='';$('#custom-editor').showModal()}
 $('#add-custom').onclick=()=>openCustom();$('#edit-custom').onclick=()=>{const id=detailExhibition.id;$('#details').close();openCustom(id)};$('#custom-close').onclick=()=>$('#custom-editor').close();$('#custom-editor').addEventListener('cancel',e=>{if(customBusy)e.preventDefault()});
 $('#custom-form').onsubmit=async ev=>{ev.preventDefault();if(customBusy)return;const e={id:customEditing||'custom-'+crypto.randomUUID()};for(const k of ['title','museum','region','start','end','url','fee'])e[k]=$('#custom-'+k).value.trim();const visit=$('#custom-visit').value,note=$('#custom-note').value;const error=$('#custom-error');if(!customValid(e)){error.textContent='展覧会名・会場を入力してください。会期は両方空欄にするか、初日から最終日の順に入力してください。URLは http または https で始めてください。';return}if((visit&&(!goodDate(visit)||visit>today()))||(note.trim()&&!visit)){error.textContent='感想を残す場合は、今日以前の鑑賞日を入力してください。';return}if(!customEditing&&(saved.custom||[]).length>=1000){error.textContent='手入力は1000件までです。';return}const next=structuredClone(saved);next.custom=[...(next.custom||[]).filter(x=>x.id!==e.id),e];next.favorites=next.favorites.filter(x=>x!==e.id);if($('#custom-favorite').checked)next.favorites.push(e.id);if(visit)next.records[e.id]={date:visit,note};else delete next.records[e.id];customBusy=true;$('#custom-save').disabled=true;$('#custom-close').disabled=true;try{if(await persist(next)){$('#custom-editor').close();tab=visit?'records':$('#custom-favorite').checked?'favorites':'all';document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));$('#region').value='';$('#period').value='all';$('#day').value='';$('#query').value='';render();toast('展覧会を手帖に保存しました。写真も追加できます。')}}finally{customBusy=false;$('#custom-save').disabled=false;$('#custom-close').disabled=false}};
+
+// Verified on the museum's official Instagram profile on 2026-10-12.
+const officialPosts={
+ 'https://www.asahigroup-oyamazaki.com/exhibition/rouault/':'https://www.instagram.com/p/DbKOM8vFG7b/',
+ 'https://www.asahigroup-oyamazaki.com/exhibition/monet/':'https://www.instagram.com/p/DbMzLEqAEa9/',
+ 'https://www.asahigroup-oyamazaki.com/exhibition/hagiomoto/':'https://www.instagram.com/p/Ddpp6vyDHGZ/'
+};
+let instagramReady;
+function loadInstagram(){
+ if(window.instgrm)return Promise.resolve();
+ if(instagramReady)return instagramReady;
+ instagramReady=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://www.instagram.com/embed.js';s.async=true;s.onload=resolve;s.onerror=()=>{s.remove();instagramReady=null;reject(Error('Instagram unavailable'))};document.head.append(s)});return instagramReady;
+}
+function renderInstagram(e){
+ const section=$('#detail-instagram'),host=$('#instagram-post'),url=!e.custom&&officialPosts[e.url];host.replaceChildren();section.hidden=!url;if(!url)return;
+ $('#instagram-original').href=url;
+ const block=document.createElement('blockquote');block.className='instagram-media';block.dataset.instgrmPermalink=url;block.dataset.instgrmVersion='14';
+ const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='アサヒグループ大山崎山荘美術館の公式投稿を見る';block.append(a);host.append(block);
+ loadInstagram().then(()=>{if(detailExhibition?.id===e.id&&$('#details').open)window.instgrm?.Embeds?.process()}).catch(()=>{});
+}
+$('#details').addEventListener('close',()=>$('#instagram-post').replaceChildren());

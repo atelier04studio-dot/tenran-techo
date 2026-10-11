@@ -44,12 +44,18 @@ def parse(key,s):
   for block in re.split(r'<div class="exhibitionList__item"',s)[1:]:
    title=field(block,'h3','exhibitionList__title');period=dates(field(block,'div','exhibitionList__date'));link=re.search(r'<a[^>]+href="([^"]+)"',block)
    if title and period and link:result.append((text(title),*period,link[1]))
+ elif key=='oyamazaki':
+  for block in re.split(r'<div class="p-exhibitionBlock is-page">',s)[1:]:
+   title=field(block,'h3','p-exhibitionCard_title');period=dates(field(block,'time','p-exhibitionCard_time'))
+   link=re.search(r'href=["\']([^"\']+)["\']',block)
+   if title and period and link:result.append((text(title),*period,urllib.parse.urljoin(SOURCES[key][2],html.unescape(link[1]))))
  elif key=='kobe':
   title=field(s,'span','detail_title');period=dates(field(s,'span','detail_date'))
   if title and period:result.append((text(title),*period,''))
  return list(dict.fromkeys(result))
 SOURCES={'hyogo':('兵庫県立美術館','兵庫','https://www.artm.pref.hyogo.jp/exhibition/'),'osaka':('大阪中之島美術館','大阪','https://nakka-art.jp/'),'kyohaku':('京都国立博物館','京都','https://www.kyohaku.go.jp/jp/exhibitions/')}
 
+SOURCES['oyamazaki']=('アサヒグループ大山崎山荘美術館','京都','https://www.asahigroup-oyamazaki.com/exhibition/')
 SOURCES['kobe']=('神戸市立博物館','兵庫','https://www.kobecitymuseum.jp/exhibition/special')
 
 def fetch_html(url):
