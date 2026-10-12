@@ -17,3 +17,5 @@
 .museum-cover img{mix-blend-mode:normal;-webkit-filter:url(#museum-paper);filter:url(#museum-paper)}
 
 #detail-instagram{margin-top:28px;min-width:0}#instagram-post{width:100%;overflow:hidden}#instagram-post .instagram-media,#instagram-post iframe{min-width:0!important;max-width:100%!important;width:100%!important;margin:0!important}#detail-instagram a{overflow-wrap:anywhere}
+
+.brand-symbol{font-family:Arial,Helvetica,sans-serif;font-weight:900;letter-spacing:-1.5px;padding-right:1px}
