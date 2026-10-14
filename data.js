@@ -744,4 +744,4 @@ window.EXHIBITIONS=[
     "sourceKey": "oyamazaki"
   }
 ];
-window.COLLECTION_STATUS={"checkedAt": "2026-10-13T21:40:29.694262+00:00", "sources": [{"museum": "兵庫県立美術館", "status": "取得成功", "count": 11}, {"museum": "大阪中之島美術館", "status": "取得成功", "count": 7}, {"museum": "京都国立博物館", "status": "取得成功", "count": 28}, {"museum": "アサヒグループ大山崎山荘美術館", "status": "取得成功", "count": 4}, {"museum": "神戸市立博物館", "status": "取得成功", "count": 2}, {"museum": "京都市京セラ美術館・国立西洋美術館", "status": "手動確認分を掲載・自動更新対象外"}], "admission": {"取得成功": 11, "確認できず": 2, "取得失敗": 0}};
+window.COLLECTION_STATUS={"checkedAt": "2026-10-14T09:04:56.364941+00:00", "sources": [{"museum": "兵庫県立美術館", "status": "取得成功", "count": 11}, {"museum": "大阪中之島美術館", "status": "取得成功", "count": 7}, {"museum": "京都国立博物館", "status": "取得成功", "count": 28}, {"museum": "アサヒグループ大山崎山荘美術館", "status": "取得成功", "count": 4}, {"museum": "神戸市立博物館", "status": "取得成功", "count": 2}, {"museum": "京都市京セラ美術館・国立西洋美術館", "status": "手動確認分を掲載・自動更新対象外"}], "admission": {"取得成功": 11, "確認できず": 2, "取得失敗": 0}};
