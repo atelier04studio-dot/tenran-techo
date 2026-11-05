@@ -10,7 +10,44 @@ function database(){return new Promise((resolve,reject)=>{const r=indexedDB.open
 async function persist(next){try{if(!valid(next))throw Error('Invalid notebook');await new Promise((resolve,reject)=>{const tx=db.transaction('notebook','readwrite');tx.objectStore('notebook').put(next,'state');tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error)});saved=next;render();return true}catch{toast('保存できませんでした。空き容量やブラウザの保存設定をご確認ください。');return false}}
 async function init(){try{db=await database();const x=await new Promise((resolve,reject)=>{const r=db.transaction('notebook').objectStore('notebook').get('state');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)});if(x&&valid(x))saved=x;else{let old;try{old=JSON.parse(localStorage.getItem(KEY))}catch{}if(valid(old))saved={...old,photos:{}};}saved.photos ||= {};saved.custom ||= [];$('#add-custom').disabled=false;$('#backup').disabled=false;render()}catch{toast('端末の保存領域を開けません。写真や記録は保存できません。');render()}}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function render(){const date=today(), region=$('#region').value, period=$('#period').value, day=$('#day').value,q=$('#query').value.trim().toLowerCase();const list=allExhibitions().filter(e=>{if(tab==='favorites'&&!saved.favorites.includes(e.id))return false;if(tab==='records'&&!saved.records[e.id])return false;if(region==='関西'&&!['兵庫','大阪','京都'].includes(e.region))return false;if(region==='その他'&&['兵庫','大阪','京都'].includes(e.region))return false;if(region&&!['関西','その他'].includes(region)&&e.region!==region)return false;if(period==='active'&&e.end&&e.end<date)return false;if(period==='now'&&(!e.start||e.start>date||e.end<date))return false;if(period==='soon'&&(!e.start||e.start<=date))return false;if(day&&(!e.start||e.start>day||e.end<day))return false;return (e.title+e.museum).toLowerCase().includes(q)}).sort((a,b)=>a[$('#sort').value].localeCompare(b[$('#sort').value]));$('#heading').textContent={all:'展覧会との出会い',favorites:'行きたい展覧会',records:'わたしの鑑賞記録'}[tab];$('#count').textContent=list.length+' 件';$('#fav-count').textContent=saved.favorites.length;$('#record-count').textContent=Object.keys(saved.records).length;$('#empty').hidden=!!list.length;$('#grid').innerHTML=list.map((e,i)=>{const fav=saved.favorites.includes(e.id),r=saved.records[e.id],photos=saved.photos[e.id]||[];return `<article class="card"><div role="button" tabindex="0" data-detail="${e.id}" aria-label="${esc(e.title)}の詳細を見る" class="poster ${photos.length?'has-photo':''}" style="--bg:${e.bg};--fg:${e.fg}">${photos.length?`<img class="cover-photo" src="${photos[0].src}" alt="${esc(e.title)}の表紙写真">`: ''}<span class="number">${esc(e.region)} / EXHIBITION</span><h3>${esc(e.short).replace(/\n/g,'<br>')}</h3><small>展覧手帖 ORIGINAL DESIGN</small></div><div class="card-top"><span class="badge">${!e.start?'会期未登録':e.end<date?'会期終了':e.start>date?'これから':'会期中'}</span><button class="favorite" data-fav="${e.id}" aria-label="${esc(e.title)}を${fav?'お気に入りから外す':'お気に入りに追加'}" aria-pressed="${fav}">${fav?'♥':'♡'}</button></div><h4>${esc(e.title)}</h4><p class="meta">${esc(e.museum)} / ${esc(e.region)}</p><p class="meta">${esc(periodText(e))}</p>${r?`<p class="saved-note">${esc(r.date)} 鑑賞<br>${esc(r.note)}</p>`:''}${photos.length?`<div class="photo-strip">${photos.map((p,i)=>`<button data-record="${e.id}" aria-label="写真${i+1}を表示・編集"><img src="${p.src}" alt="写真${i+1}" loading="lazy"></button>`).join('')}</div>`:''}<div class="actions">${e.url?`<a href="${esc(e.url)}" target="_blank" rel="noopener noreferrer">公式案内を見る ↗</a>`:`<span class="meta">自分で登録</span>`}<button data-record="${e.id}">${r?'記録・写真を編集':'写真・記録を追加'}</button></div></article>`}).join('')}
+function cardHtml(e){
+ const date=today(),fav=saved.favorites.includes(e.id),r=saved.records[e.id],photos=saved.photos[e.id]||[];
+ const coverPhoto=photos.length?photos[0].src:(e.image||'');
+ const hasPhoto=!!coverPhoto;
+ return `<article class="card"><div role="button" tabindex="0" data-detail="${e.id}" aria-label="${esc(e.title)}の詳細を見る" class="poster ${hasPhoto?'has-photo':''}" style="--bg:${e.bg};--fg:${e.fg}">${hasPhoto?`<img class="cover-photo" src="${esc(coverPhoto)}" alt="${esc(e.title)}の表紙写真" loading="lazy" onerror="this.closest('.poster').classList.remove('has-photo');this.remove()">`: ''}<span class="number">${esc(e.region)} / EXHIBITION</span><h3>${esc(e.short).replace(/\n/g,'<br>')}</h3><small>展覧手帖 ORIGINAL DESIGN</small></div><div class="card-top"><span class="badge">${!e.start?'会期未登録':e.end<date?'会期終了':e.start>date?'これから':'会期中'}</span><button class="favorite" data-fav="${e.id}" aria-label="${esc(e.title)}を${fav?'お気に入りから外す':'お気に入りに追加'}" aria-pressed="${fav}">${fav?'♥':'♡'}</button></div><h4>${esc(e.title)}</h4><p class="meta">${esc(e.museum)} / ${esc(e.region)}</p><p class="meta">${esc(periodText(e))}</p>${r?`<p class="saved-note">${esc(r.date)} 鑑賞<br>${esc(r.note)}</p>`:''}${photos.length?`<div class="photo-strip">${photos.map((p,i)=>`<button data-record="${e.id}" aria-label="写真${i+1}を表示・編集"><img src="${p.src}" alt="写真${i+1}" loading="lazy"></button>`).join('')}</div>`:''}<div class="actions">${e.url?`<a href="${esc(e.url)}" target="_blank" rel="noopener noreferrer">公式案内を見る ↗</a>`:`<span class="meta">自分で登録</span>`}<button data-record="${e.id}">${r?'記録・写真を編集':'写真・記録を追加'}</button></div></article>`;
+}
+let currentRenderList=[],renderedCount=0,scrollObserver=null;
+function appendNextCards(){
+ if(renderedCount>=currentRenderList.length){const s=$('#scroll-sentinel');if(s)s.remove();return}
+ const next=currentRenderList.slice(renderedCount,renderedCount+18);
+ renderedCount+=next.length;
+ const sentinel=$('#scroll-sentinel');
+ const html=next.map(cardHtml).join('');
+ if(sentinel){sentinel.insertAdjacentHTML('beforebegin',html);if(renderedCount>=currentRenderList.length)sentinel.remove()}
+ else $('#grid').insertAdjacentHTML('beforeend',html);
+}
+function setupScrollObserver(){
+ if(scrollObserver)scrollObserver.disconnect();
+ const sentinel=$('#scroll-sentinel');
+ if(!sentinel)return;
+ scrollObserver=new IntersectionObserver(entries=>{if(entries[0].isIntersecting)appendNextCards()},{rootMargin:'400px'});
+ scrollObserver.observe(sentinel);
+}
+function render(){
+ const date=today(), region=$('#region').value, period=$('#period').value, day=$('#day').value,q=$('#query').value.trim().toLowerCase();
+ currentRenderList=allExhibitions().filter(e=>{if(tab==='favorites'&&!saved.favorites.includes(e.id))return false;if(tab==='records'&&!saved.records[e.id])return false;if(region==='関西'&&!['兵庫','大阪','京都'].includes(e.region))return false;if(region==='その他'&&['兵庫','大阪','京都'].includes(e.region))return false;if(region&&!['関西','その他'].includes(region)&&e.region!==region)return false;if(period==='active'&&e.end&&e.end<date)return false;if(period==='now'&&(!e.start||e.start>date||e.end<date))return false;if(period==='soon'&&(!e.start||e.start<=date))return false;if(day&&(!e.start||e.start>day||e.end<day))return false;return (e.title+e.museum).toLowerCase().includes(q)}).sort((a,b)=>a[$('#sort').value].localeCompare(b[$('#sort').value]));
+ $('#heading').textContent={all:'展覧会との出会い',favorites:'行きたい展覧会',records:'わたしの鑑賞記録'}[tab];
+ $('#count').textContent=currentRenderList.length+' 件';
+ $('#fav-count').textContent=saved.favorites.length;
+ $('#record-count').textContent=Object.keys(saved.records).length;
+ $('#empty').hidden=!!currentRenderList.length;
+ renderedCount=Math.min(18,currentRenderList.length);
+ const initial=currentRenderList.slice(0,renderedCount);
+ let html=initial.map(cardHtml).join('');
+ if(renderedCount<currentRenderList.length)html+='<div id="scroll-sentinel" style="grid-column:1/-1;height:50px;display:flex;align-items:center;justify-content:center;color:#617257;font-size:12px">スクロールして続きを表示中…</div>';
+ $('#grid').innerHTML=html;
+ setupScrollObserver();
+}
 for(const id of ['region','period','day','query','sort'])$('#'+id).addEventListener('input',render);
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;if(tab==='records'||tab==='favorites')$('#period').value='all';document.querySelectorAll('[data-tab]').forEach(t=>t.classList.toggle('active',t===b));render()});
 $('#grid').onclick=async e=>{const f=e.target.closest('[data-fav]'),r=e.target.closest('[data-record]');if(f){const next=structuredClone(saved),id=f.dataset.fav;next.favorites=next.favorites.includes(id)?next.favorites.filter(x=>x!==id):[...next.favorites,id];await persist(next)}if(r){editing=r.dataset.record;const record=saved.records[editing];$('#record-title').textContent=allExhibitions().find(x=>x.id===editing).title;$('#visit-date').value=record?.date||'';$('#visit-date').max=today();$('#note').value=record?.note||'';$('#delete-record').hidden=!record;draftPhotos=structuredClone(saved.photos[editing]||[]);renderPhotos();$('#editor').showModal()}};

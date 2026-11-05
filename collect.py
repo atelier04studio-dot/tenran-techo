@@ -119,6 +119,22 @@ def parse_fee(key,raw):
    if price and '内は前売料金' in text(block):return fee_amount(price[1]+'円')
  return None
 
+def parse_image(key,raw,page_url):
+ """Extract official exhibition image/poster URL from individual page."""
+ m=re.search(r'<meta\b[^>]*property=["\']og:image["\'][^>]*content=["\']([^"\']+)["\']',raw,re.I)
+ if not m:m=re.search(r'<meta\b[^>]*content=["\']([^"\']+)["\'][^>]*property=["\']og:image["\']',raw,re.I)
+ if m:
+  val=html.unescape(m.group(1).strip())
+  if val and not val.endswith('.svg') and 'logo' not in val.lower():
+   return urllib.parse.urljoin(page_url,val)
+ if key=='hyogo':
+  m=re.search(r'<img\b[^>]*src=["\']([^"\']*(?:top_main-img|main-img)[^"\']*)["\']',raw,re.I)
+  if m:return urllib.parse.urljoin(page_url,html.unescape(m.group(1).strip()))
+ elif key=='kobe':
+  m=re.search(r'<div\b[^>]*class=["\'][^"\']*\bdetail_image\b[^"\']*["\'][^>]*>\s*<img\b[^>]*src=["\']([^"\']+)["\']',raw,re.I)
+  if m:return urllib.parse.urljoin(page_url,html.unescape(m.group(1).strip()))
+ return None
+
 def update_fees(entries,today):
  cache={};counts={'取得成功':0,'確認できず':0,'取得失敗':0}
  for e in entries:
@@ -135,10 +151,17 @@ def update_fees(entries,today):
      if urllib.parse.urlparse(r.url).hostname!=urllib.parse.urlparse(url).hostname:raise ValueError('Unexpected redirect')
      raw=r.read(4000000).decode('utf-8')
     amount=parse_fee(key,raw)
+    img=parse_image(key,raw,url)
     cache[url]={'status':'取得成功' if amount is not None else '確認できず','checkedAt':today,'sourceUrl':url}
     if amount is not None:cache[url]['yen']=amount
+    if img:cache[url]['image']=img
    except Exception:cache[url]={'status':'取得失敗','checkedAt':today,'sourceUrl':url}
-  e['admission']=dict(cache[url]);counts[e['admission']['status']]+=1
+  data=cache[url]
+  adm={'status':data['status'],'checkedAt':data['checkedAt'],'sourceUrl':data['sourceUrl']}
+  if data.get('yen') is not None:adm['yen']=data['yen']
+  e['admission']=adm
+  if data.get('image'):e['image']=data['image']
+  counts[adm['status']]+=1
  return counts
 
 def main():
